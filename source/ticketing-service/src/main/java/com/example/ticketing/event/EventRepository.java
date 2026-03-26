@@ -57,4 +57,13 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query(value = "UPDATE events SET available_seats = available_seats - 1 WHERE id = :id AND available_seats > 0",
             nativeQuery = true)
     int decrementAvailableSeats(@Param("id") Long id);
+
+    /**
+     * Increment available_seats — used when reservation expires or is cancelled (2.E).
+     * Returns seat back to pool.
+     */
+    @Modifying
+    @Query(value = "UPDATE events SET available_seats = available_seats + 1 WHERE id = :id AND available_seats < total_seats",
+            nativeQuery = true)
+    int incrementAvailableSeats(@Param("id") Long id);
 }

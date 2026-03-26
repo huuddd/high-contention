@@ -29,7 +29,7 @@ Dịch vụ đặt vé với 6 chiến lược xử lý contention, từ Naive (
 | B | Pessimistic Locking | `impl/pessimistic-locking` | ⬜ |
 | C | OCC + Retry Backoff | `impl/occ` | ⬜ |
 | D | SERIALIZABLE | `impl/serializable` | ⬜ |
-| E | Reservation + TTL + Fencing | `impl/reservation-fencing` | ⬜ |
+| E | Reservation + TTL + Fencing | `impl/reservation-fencing` | ✅ |
 | F | Queue-based per-event | `impl/queue-based` | ⬜ |
 
 ## Prerequisites
@@ -130,3 +130,4 @@ reservations    → id, event_id, seat_id, user_id, fencing_token, status, expir
 - [x] **1.2** Flyway schema migration — events, seats, tickets, reservations
 - [x] **1.3** Seed data — `make seed` creates 1 event + 100 seats (idempotent)
 - [x] **1.4** Shared utilities — TicketingStrategy, RetryWithBackoff, ConflictMetrics, IdempotencyFilter, JPA entities
+- [x] **2.E** Reservation + Fencing Token — 2-step reserve/confirm, TTL expiry, background cleanup (branch: `impl/reservation-fencing`)

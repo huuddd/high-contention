@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.Optional;
 
 /**
@@ -41,23 +42,31 @@ public interface SeatRepository extends JpaRepository<Seat, Long> {
                                                        @Param("seatLabel") String seatLabel);
 
     /**
-     * Mark seat as SOLD — used after successful ticket creation.
+     * Mark seat as SOLD from AVAILABLE — used by Naive/Pessimistic/OCC/Serializable.
      */
     @Modifying
     @Query("UPDATE Seat s SET s.status = 'SOLD' WHERE s.id = :seatId AND s.status = 'AVAILABLE'")
     int markAsSold(@Param("seatId") Long seatId);
 
     /**
-     * Mark seat as LOCKED for reservation — used by Reservation strategy (2.E).
+     * Mark seat as SOLD from LOCKED — used by Reservation confirm (2.E).
      */
     @Modifying
-    @Query(value = "UPDATE seats SET status = 'LOCKED', locked_by = :userId, " +
-            "locked_until = NOW() + INTERVAL '1 minute' * :ttlMinutes " +
+    @Query("UPDATE Seat s SET s.status = 'SOLD' WHERE s.id = :seatId AND s.status = 'LOCKED'")
+    int markLockedAsSold(@Param("seatId") Long seatId);
+
+    /**
+     * Mark seat as LOCKED for reservation — used by Reservation strategy (2.E).
+     * Accepts explicit expiresAt timestamp instead of computing from TTL.
+     */
+    @Modifying
+    @Query(value = "UPDATE seats SET status = 'LOCKED', locked_by = CAST(:userId AS UUID), " +
+            "locked_until = CAST(:expiresAt AS TIMESTAMP WITH TIME ZONE) " +
             "WHERE id = :seatId AND status = 'AVAILABLE'",
             nativeQuery = true)
     int lockForReservation(@Param("seatId") Long seatId,
                            @Param("userId") java.util.UUID userId,
-                           @Param("ttlMinutes") int ttlMinutes);
+                           @Param("expiresAt") Instant expiresAt);
 
     /**
      * Release a locked seat back to AVAILABLE — used when reservation expires or is cancelled.
@@ -65,5 +74,5 @@ public interface SeatRepository extends JpaRepository<Seat, Long> {
     @Modifying
     @Query("UPDATE Seat s SET s.status = 'AVAILABLE', s.lockedBy = NULL, s.lockedUntil = NULL " +
             "WHERE s.id = :seatId AND s.status = 'LOCKED'")
-    int releaseLockedSeat(@Param("seatId") Long seatId);
+    int releaseSeat(@Param("seatId") Long seatId);
 }
