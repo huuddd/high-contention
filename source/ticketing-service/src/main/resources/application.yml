@@ -61,6 +61,7 @@ management:
 
 # --- Application custom config ---
 ticketing:
+  strategy: queue  # naive | pessimistic | occ | serializable | reservation | queue
   retry:
     max-attempts: 5
     initial-delay-ms: 50
@@ -69,5 +70,10 @@ ticketing:
     jitter: true
   reservation:
     ttl-minutes: 10
+  queue:
+    max-size: 10000
+    worker-threads: 1
+    poll-timeout-seconds: 5
+    default-event-id: 1
   idempotency:
     ttl-seconds: 3600
