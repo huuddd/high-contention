@@ -95,6 +95,21 @@ source/ticketing-service/
     └── application.yml                  ← DB, Redis, Hikari, Actuator config
 ```
 
+## Database Schema
+
+```
+events          → id, name, total_seats, available_seats, version, created_at
+seats           → id, event_id, seat_label, status, locked_by, locked_until
+tickets         → id, event_id, seat_id, user_id, idempotency_key, created_at
+reservations    → id, event_id, seat_id, user_id, fencing_token, status, expires_at, created_at
+```
+
+**DB-level invariant guards:**
+- `CHECK (available_seats >= 0)` — ngăn oversell
+- `UNIQUE (event_id, seat_id)` on tickets — ngăn double-book
+- `CHECK (status IN (...))` — state machine enforcement
+
 ## Completed Tasks
 
 - [x] **1.1** Docker Compose + Makefile — `make db-up` starts PG16 + Redis 7
+- [x] **1.2** Flyway schema migration — events, seats, tickets, reservations
