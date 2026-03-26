@@ -1,0 +1,73 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: ticketing-service
+
+  # --- PostgreSQL DataSource ---
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ticketing
+    username: ticketing
+    password: ticketing
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 50
+      minimum-idle: 10
+      connection-timeout: 5000
+      idle-timeout: 300000
+      max-lifetime: 600000
+      pool-name: ticketing-hikari
+
+  # --- JPA / Hibernate ---
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        format_sql: false
+    show-sql: false
+
+  # --- Flyway ---
+  flyway:
+    enabled: true
+    locations: filesystem:../../db/migrations
+    baseline-on-migrate: true
+
+  # --- Redis ---
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 3000
+
+# --- Actuator ---
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: ticketing-service
+
+# --- Application custom config ---
+ticketing:
+  retry:
+    max-attempts: 5
+    initial-delay-ms: 50
+    max-delay-ms: 2000
+    multiplier: 2.0
+    jitter: true
+  reservation:
+    ttl-minutes: 10
+  idempotency:
+    ttl-seconds: 3600
