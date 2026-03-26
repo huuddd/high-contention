@@ -84,13 +84,28 @@ source/ticketing-service/
 ├── pom.xml                              ← Spring Boot 3.2.5 + Java 17
 ├── src/main/java/com/example/ticketing/
 │   ├── TicketingApplication.java        ← entry point
-│   ├── config/
+│   ├── common/
+│   │   ├── IdempotencyFilter.java       ← duplicate request guard (Redis SET NX)
+│   │   ├── RetryWithBackoff.java        ← exponential backoff + jitter
+│   │   └── TicketingConstants.java      ← centralized constants, PG error codes
 │   ├── event/
-│   ├── ticket/strategy/
+│   │   ├── Event.java                   ← JPA entity
+│   │   ├── EventController.java         ← GET /events/{id}, GET /events/{id}/stats
+│   │   └── EventRepository.java         ← findById, findByIdForUpdate, decrement
+│   ├── ticket/
+│   │   ├── Seat.java                    ← JPA entity (status state machine)
+│   │   ├── SeatRepository.java          ← findForUpdate, markAsSold, lockForReservation
+│   │   ├── Ticket.java                  ← JPA entity (proof of ownership)
+│   │   ├── TicketController.java        ← POST /tickets/reserve-and-buy
+│   │   ├── TicketRepository.java        ← findByIdempotencyKey, countByEventId
+│   │   ├── TicketResult.java            ← result record (SUCCESS/CONFLICT/ERROR)
+│   │   └── strategy/
+│   │       └── TicketingStrategy.java   ← Strategy Pattern interface
 │   ├── reservation/
-│   ├── queue/
-│   ├── observability/
-│   └── common/
+│   │   └── Reservation.java             ← JPA entity (TTL + fencing token)
+│   ├── queue/                           ← (2.F — Queue-based)
+│   └── observability/
+│       └── ConflictMetrics.java         ← Micrometer counters (conflicts, retries, deadlocks)
 └── src/main/resources/
     └── application.yml                  ← DB, Redis, Hikari, Actuator config
 ```
@@ -114,3 +129,4 @@ reservations    → id, event_id, seat_id, user_id, fencing_token, status, expir
 - [x] **1.1** Docker Compose + Makefile — `make db-up` starts PG16 + Redis 7
 - [x] **1.2** Flyway schema migration — events, seats, tickets, reservations
 - [x] **1.3** Seed data — `make seed` creates 1 event + 100 seats (idempotent)
+- [x] **1.4** Shared utilities — TicketingStrategy, RetryWithBackoff, ConflictMetrics, IdempotencyFilter, JPA entities
