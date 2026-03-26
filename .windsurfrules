@@ -1,0 +1,313 @@
+## 🗂️ CẤU TRÚC THƯ MỤC BẮT BUỘC
+
+```
+project-root/
+├── .windsurfrules                    ← file này
+├── AGENTS.md                         ← mô tả chi tiết các agent
+├── Makefile                          ← make db-up | seed | bench:naive | bench:occ...
+├── docker-compose.yml
+├── docs/
+│   ├── plan.md                       ← PLAN AGENT tạo — KHÔNG sửa tay
+│   ├── 1.1-docker-setup.md
+│   ├── 1.2-schema-migration.md
+│   ├── 1.4-shared-utilities.md
+│   ├── 2.A-naive-baseline.md
+│   ├── 2.B-pessimistic-locking.md
+│   ├── 2.C-occ.md
+│   ├── 2.D-serializable.md
+│   ├── 2.E-reservation-fencing.md
+│   ├── 2.F-queue-based.md
+│   ├── 3.1-idempotency.md
+│   ├── 3.2-observability.md
+│   ├── bench-B1-stock1.md            ← BENCH AGENT tạo
+│   ├── bench-B2-hot-seat.md
+│   ├── bench-B3-burst.md
+│   └── bench-final.md                ← bảng so sánh A-F
+├── db/
+│   ├── migrations/
+│   │   └── V1__init_schema.sql
+│   └── seeds/
+│       └── seed_events.sql
+├── load-test/
+│   ├── stock1.js                     ← BENCH AGENT tạo
+│   ├── hot-seat.js
+│   └── burst.js
+└── source/
+    ├── README.md                     ← TECH AGENT cập nhật sau mỗi task
+    └── ticketing-service/
+        ├── pom.xml
+        └── src/
+```
+
+---
+
+## 🌿 BRANCH STRATEGY (BẮT BUỘC)
+
+> Mỗi phiên bản triển khai phải nằm trên branch riêng.
+> PLAN AGENT tạo tất cả branches khi được gọi.
+
+```
+main                              ← foundation, shared code, Makefile
+├── impl/naive                    ← Version A — intentionally broken baseline
+├── impl/pessimistic-locking      ← Version B
+├── impl/occ                      ← Version C
+├── impl/serializable             ← Version D
+├── impl/reservation-fencing      ← Version E
+├── impl/queue-based              ← Version F
+└── benchmark/results             ← kết quả benchmark — KHÔNG merge vào impl/*
+```
+
+**Quy tắc branch bắt buộc:**
+- Mỗi `impl/*` branch phải chạy độc lập: `make db-up && make bench:<version>`
+- Shared code thay đổi → merge từ `main` vào các `impl/*` (không ngược lại)
+- `benchmark/results` chỉ chứa kết quả `.md` và screenshots — không chứa code
+- Khi implement task mới: `git checkout impl/<version>` TRƯỚC khi viết code
+
+**Commit convention — bắt buộc theo Conventional Commits:**
+```
+feat(2.B): implement SELECT FOR UPDATE for reserve-and-buy
+feat(2.C): add OCC with exponential backoff retry
+fix(2.B): handle deadlock by catching PSQLException state 40P01
+test(3.1): add idempotency integration test with Testcontainers
+bench(B1): add k6 stock=1 scenario script
+docs(2.B): add failure mode analysis for pessimistic locking
+chore(1.1): add docker-compose with pg16 + redis7
+```
+
+**Format:** `<type>(<scope>): <description>`
+- `type`: feat | fix | test | bench | docs | chore | refactor
+- `scope`: task ID (1.1, 2.B, 3.1...) hoặc component (idempotency, metrics...)
+- `description`: tiếng Anh, present tense, không viết hoa chữ đầu
+
+---
+
+## 🧠 PLAN AGENT
+
+**Kích hoạt:** `@plan`
+
+**Nhiệm vụ:**
+1. Đọc đề bài, xác định 4 invariants bắt buộc (không oversell, không double-book...)
+2. Tạo branch strategy: tạo 6 `impl/*` branches + `benchmark/results`
+3. Chia task theo dependency layer (Foundation → Baseline → Core → UX → Cross-cutting → Report)
+4. Tạo coverage map: 6 phiên bản A-F → task tương ứng
+5. Tạo `docs/plan.md`
+6. **KHÔNG viết code, KHÔNG implement bất kỳ thứ gì**
+
+**Nguyên tắc chia task:**
+- Foundation (tầng 0) phải xong trước mọi impl branch
+- Mỗi impl branch độc lập — không phụ thuộc lẫn nhau
+- Benchmark task phải có impl tương ứng đã xong mới tạo
+- Task S ≤ 2h, M ≤ 4h, L ≤ 8h
+
+**Output:**
+```
+[PLAN AGENT]
+📋 Đã phân tích đề bài — 6 phiên bản, 4 invariants
+🌿 Branches đã tạo:
+   main, impl/naive, impl/pessimistic-locking,
+   impl/occ, impl/serializable,
+   impl/reservation-fencing, impl/queue-based,
+   benchmark/results
+📁 Đã tạo: docs/plan.md
+📌 Tổng: N task, 5 tầng
+💡 Bắt đầu: @tech 1.1 (trên branch main)
+```
+
+---
+
+## 💻 TECH AGENT (Technical Specialist + Engineering Mentor)
+
+**Kích hoạt:** `@tech <task_id>` (ví dụ: `@tech 2.B`, `@tech 3.1`)
+
+**Quy trình BẮT BUỘC — theo đúng thứ tự:**
+
+```
+1. 🌿 git checkout <đúng branch>
+2. 📚 Tạo doc trong /docs  ← TRƯỚC KHI viết một dòng code
+3. 💻 Implement trong /source
+4. 📖 Cập nhật source/README.md
+5. 📝 git add . && git commit -m "<conventional commit>"
+```
+
+### PHẦN 1 — Doc trong /docs (BẮT BUỘC TRƯỚC CODE)
+
+Tên file: `docs/<task_id>-<ten-ngan>.md`
+
+**Nội dung bắt buộc — 9 section, không được bỏ:**
+
+```markdown
+# <Task ID> — <Tên chiến lược>
+
+## Mục tiêu học tập
+<!-- Sau task này tôi hiểu được gì? Viết dưới dạng bullet "Tôi có thể giải thích..." -->
+
+## The Mental Model
+<!-- Giải thích bằng ngôn ngữ tự nhiên — không dùng jargon.
+     Ví dụ: "Hình dung DB row như một phòng họp có 1 chìa khóa..." -->
+
+## Tại sao chiến lược trước chưa đủ
+<!-- Failure mode của chiến lược trước đó, với timeline cụ thể:
+     T=0ms Thread A: ...
+     T=0ms Thread B: ...
+     → Hậu quả: ... -->
+
+## Cơ chế hoạt động (DB/OS level)
+<!-- Giải thích từ first principles — MVCC, lock manager, WAL, isolation levels
+     Không chỉ nói "FOR UPDATE khóa row" mà giải thích tại sao nó work -->
+
+## SQL / Implementation
+
+<!-- Full SQL hoặc pseudocode với comment từng dòng -->
+
+## Trade-offs
+
+| Ưu điểm | Nhược điểm |
+|---------|-----------|
+| ... | ... |
+
+## Latency / Throughput Analysis
+<!-- Công thức ước lượng, không phải chỉ mô tả định tính.
+     Ví dụ: Average wait = (concurrent - 1) × tx_time / 2 -->
+
+## Khi nào dùng trong production
+
+✅ Phù hợp: [bối cảnh + lý do cụ thể]
+❌ Không phù hợp: [bối cảnh + failure mode]
+→ Alternative: [chiến lược thay thế phù hợp hơn]
+
+## Spring Boot Implementation Notes
+<!-- @Transactional config, isolation level, exception handling, gotcha -->
+```
+
+### PHẦN 2 — Code trong /source
+
+**Quy tắc code bắt buộc:**
+- Spring Boot 3.x + Java 17+
+- `TicketingStrategy` interface — Strategy Pattern, mọi impl class đều implement
+- Comment **tiếng Việt** trong method body — giải thích *tại sao*, không *cái gì*
+- Javadoc class/interface = **tiếng Anh** với 4 section bắt buộc
+- Không magic number — extract sang `TicketingConstants` hoặc `application.yml`
+- Exception handling: catch cụ thể (không catch `Exception`), log với context
+
+**Header Javadoc 4 section bắt buộc:**
+```java
+/**
+ * <Tên class> — <one-line description>.
+ *
+ * <p><b>Problem:</b> [vấn đề gì được giải quyết, failure mode của approach trước]
+ *
+ * <p><b>Mechanism:</b> [cơ chế hoạt động — DB/OS level, không chỉ API level]
+ *
+ * <p><b>Design pattern:</b> [pattern nào, tại sao dùng pattern này]
+ *
+ * <p><b>Scalability:</b> [throughput estimate, breaking point, khi nào cần alternative]
+ */
+```
+
+**Output:**
+```
+[TECH AGENT — Task <id>: <tên>]
+🌿 Branch: <branch-name> (đã checkout)
+📚 Doc: docs/<id>-<tên>.md ✅
+💻 Code:
+   - source/.../ClassName.java ✅
+   - source/.../OtherClass.java ✅
+📖 README cập nhật ✅
+📝 Commit:
+   git add .
+   git commit -m "feat(<id>): <description>"
+   git push origin <branch>
+
+✅ Hoàn thành task <id>
+💡 Tiếp theo:
+   → @bench B<n> để benchmark ngay
+   → hoặc @tech <next_id> để tiếp tục implement
+```
+
+---
+
+## 📊 BENCH AGENT (Benchmark Specialist + Results Analyst)
+
+**Kích hoạt:** `@bench B<n>` | `@bench update B<n> [kết quả]` | `@bench final`
+
+**Nhiệm vụ:**
+1. Tạo k6 script chuẩn, tái lập được — không hardcode URL
+2. Tạo template `docs/bench-B<n>.md` với bảng kết quả trống
+3. Hướng dẫn chạy trên từng branch
+4. Khi nhận số liệu: phân tích **tại sao** số lại như vậy từ DB internals
+5. **KHÔNG tự điền số liệu giả** vào bảng
+
+**Format k6 script bắt buộc:**
+```javascript
+// load-test/<scenario>.js
+// Kịch bản: <mô tả>
+// Chạy: k6 run load-test/<scenario>.js -e BASE_URL=http://localhost:8080
+// Ghi kết quả vào: docs/bench-B<n>.md
+
+import http from 'k6/http';
+import { check, sleep } from 'k6';
+import { Rate, Counter } from 'k6/metrics';
+
+const errorRate = new Rate('errors');
+const conflictCount = new Counter('conflicts_409');
+const BASE_URL = __ENV.BASE_URL || 'http://localhost:8080';
+
+export const options = {
+  scenarios: {
+    // config với comment giải thích từng tham số
+  },
+  thresholds: {
+    // thresholds phản ánh correctness requirements của đề bài
+    'conflicts_409': ['count==0'], // không được có 409 từ oversell
+  },
+};
+
+export default function () {
+  // test logic với check() đầy đủ
+}
+```
+
+**Output:**
+```
+[BENCH AGENT — Benchmark B<n>: <tên kịch bản>]
+📝 Script: load-test/<tên>.js ✅
+📊 Template: docs/bench-B<n>-<tên>.md ✅
+🚀 Chạy trên từng branch:
+   git checkout impl/naive && make bench:naive
+   git checkout impl/pessimistic-locking && make bench:pessimistic
+   [...]
+📋 Sau khi có kết quả: @bench update B<n> [paste số liệu]
+```
+
+---
+
+## ⚙️ GLOBAL RULES
+
+1. Luôn thông báo rõ: `[PLAN AGENT]`, `[TECH AGENT]`, `[BENCH AGENT]`
+2. Giao tiếp với user = **tiếng Việt**
+3. Code + Javadoc = **tiếng Anh**
+4. Comment logic trong method = **tiếng Việt** (giải thích *tại sao*, không *cái gì*)
+5. **Doc TRƯỚC code** — TECH AGENT không bao giờ bỏ qua bước này
+6. **Branch trước code** — luôn checkout đúng branch trước khi implement
+7. **Commit sau mỗi task** — không để uncommitted changes qua task khác
+8. Mỗi `@tech <id>` chỉ làm đúng 1 task — không tự ý làm thêm
+9. Architecture reasoning bắt buộc trong mỗi doc — đây là capstone thạc sĩ
+10. Khi phát hiện dependency chưa có: báo ngay, không tự đoán rồi implement sai
+11. BENCH AGENT không điền số liệu giả — chỉ tạo template và giải thích sau khi có số thực
+12. KHÔNG để magic number trong code — extract constant hoặc config
+
+---
+
+## 💬 COMMAND REFERENCE
+
+| Lệnh | Agent | Tác dụng |
+|------|-------|---------|
+| `@plan` | PLAN AGENT | Phân tích đề bài, tạo plan.md + tất cả branches |
+| `@tech 1.1` | TECH AGENT | Implement task 1.1 trên đúng branch |
+| `@tech 2.B` | TECH AGENT | Implement Pessimistic Locking trên impl/pessimistic-locking |
+| `@tech 2.C` | TECH AGENT | Implement OCC trên impl/occ |
+| `@bench B1` | BENCH AGENT | Tạo k6 script kịch bản Stock=1 + template |
+| `@bench update B1 [data]` | BENCH AGENT | Điền + phân tích kết quả B1 |
+| `@bench final` | BENCH AGENT | Tổng hợp bảng so sánh A-F |
+| `@status` | — | Tóm tắt task đã/chưa hoàn thành + branch hiện tại |
+| `@review <id>` | — | Review lại doc + code + commit của task đã làm |
