@@ -61,6 +61,7 @@ management:
 
 # --- Application custom config ---
 ticketing:
+  strategy: occ  # naive | pessimistic | occ | serializable | reservation | queue
   retry:
     max-attempts: 5
     initial-delay-ms: 50
