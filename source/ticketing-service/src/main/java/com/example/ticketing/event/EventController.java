@@ -4,6 +4,7 @@ import com.example.ticketing.ticket.TicketRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -53,14 +54,15 @@ public class EventController {
                     // Kiểm tra consistency: available + sold = total
                     boolean consistent = (event.getAvailableSeats() + soldCount) == event.getTotalSeats();
 
-                    return ResponseEntity.ok(Map.of(
-                            "eventId", event.getId(),
-                            "eventName", event.getName(),
-                            "totalSeats", event.getTotalSeats(),
-                            "availableSeats", event.getAvailableSeats(),
-                            "soldCount", soldCount,
-                            "consistent", consistent
-                    ));
+                    Map<String, Object> stats = new LinkedHashMap<>();
+                    stats.put("eventId", event.getId());
+                    stats.put("eventName", event.getName());
+                    stats.put("totalSeats", event.getTotalSeats());
+                    stats.put("availableSeats", event.getAvailableSeats());
+                    stats.put("soldCount", soldCount);
+                    stats.put("consistent", consistent);
+
+                    return ResponseEntity.ok(stats);
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
