@@ -133,3 +133,4 @@ reservations    → id, event_id, seat_id, user_id, fencing_token, status, expir
 - [x] **3.1** Idempotency — defense-in-depth: Redis cache (status+body) + DB-level duplicate detection via `idempotency_key`
 - [x] **3.2** Observability — TicketingStatsService + enhanced `/events/{id}/stats` with Micrometer conflict metrics
 - [x] **4.1** k6 benchmark scripts — stock1.js (B1), hot-seat.js (B2), burst.js (B3) + Makefile targets
+- [x] **4.2** Benchmark comparison table — `docs/bench-final.md` template with A-F comparison + strategy selection guide
