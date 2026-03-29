@@ -1,10 +1,8 @@
 package com.example.ticketing.config;
 
 import com.example.ticketing.common.RetryWithBackoff;
-import com.example.ticketing.event.EventRepository;
 import com.example.ticketing.observability.ConflictMetrics;
-import com.example.ticketing.ticket.SeatRepository;
-import com.example.ticketing.ticket.TicketRepository;
+import com.example.ticketing.ticket.strategy.OccAttemptService;
 import com.example.ticketing.ticket.strategy.OccTicketingStrategy;
 import com.example.ticketing.ticket.strategy.TicketingStrategy;
 import org.slf4j.Logger;
@@ -35,13 +33,10 @@ public class StrategyConfig {
 
     @Bean
     @ConditionalOnProperty(name = "ticketing.strategy", havingValue = "occ", matchIfMissing = true)
-    public TicketingStrategy occTicketingStrategy(EventRepository eventRepository,
-                                                    SeatRepository seatRepository,
-                                                    TicketRepository ticketRepository,
-                                                    ConflictMetrics metrics,
-                                                    RetryWithBackoff retryWithBackoff) {
+    public TicketingStrategy occTicketingStrategy(ConflictMetrics metrics,
+                                                    RetryWithBackoff retryWithBackoff,
+                                                    OccAttemptService attemptService) {
         log.info(">>> Active strategy: OCC (Optimistic Concurrency Control + Retry Backoff)");
-        return new OccTicketingStrategy(eventRepository, seatRepository, ticketRepository,
-                metrics, retryWithBackoff);
+        return new OccTicketingStrategy(metrics, retryWithBackoff, attemptService);
     }
 }

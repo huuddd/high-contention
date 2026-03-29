@@ -64,7 +64,7 @@ public class TicketController {
             case SEAT_NOT_AVAILABLE -> ResponseEntity.status(HttpStatus.CONFLICT).body(result);
             case EVENT_NOT_FOUND -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
             case CONFLICT -> ResponseEntity.status(HttpStatus.CONFLICT).body(result);
-            case MAX_RETRIES_EXCEEDED -> ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(result);
+            case MAX_RETRIES_EXCEEDED -> ResponseEntity.status(HttpStatus.CONFLICT).body(result);
             case ERROR -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
         };
     }
