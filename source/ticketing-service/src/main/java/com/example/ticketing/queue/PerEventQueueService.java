@@ -65,14 +65,14 @@ public class PerEventQueueService {
     public boolean enqueue(QueueTicketRequest request) {
         String key = queueKey(request.eventId());
 
-        // Back-pressure check
-        Long currentSize = redisTemplate.opsForList().size(key);
-        if (currentSize != null && currentSize >= maxQueueSize) {
-            log.warn("Queue full for event={}, size={}, max={}", request.eventId(), currentSize, maxQueueSize);
-            return false;
-        }
-
         try {
+            // Back-pressure check
+            Long currentSize = redisTemplate.opsForList().size(key);
+            if (currentSize != null && currentSize >= maxQueueSize) {
+                log.warn("Queue full for event={}, size={}, max={}", request.eventId(), currentSize, maxQueueSize);
+                return false;
+            }
+
             String json = objectMapper.writeValueAsString(request);
             redisTemplate.opsForList().leftPush(key, json);
             log.debug("Enqueued request {} for event={}, seat={}",
@@ -80,6 +80,9 @@ public class PerEventQueueService {
             return true;
         } catch (JsonProcessingException e) {
             log.error("Failed to serialize queue request: {}", e.getMessage());
+            return false;
+        } catch (Exception e) {
+            log.error("Redis error during enqueue for event={}: {}", request.eventId(), e.getMessage());
             return false;
         }
     }
