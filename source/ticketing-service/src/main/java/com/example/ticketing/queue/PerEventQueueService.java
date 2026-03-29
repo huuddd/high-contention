@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import jakarta.annotation.PostConstruct;
 import java.time.Duration;
 import java.util.Optional;
 
@@ -44,6 +45,16 @@ public class PerEventQueueService {
         this.redisTemplate = redisTemplate;
         this.objectMapper = objectMapper;
         this.maxQueueSize = maxQueueSize;
+    }
+
+    @PostConstruct
+    public void init() {
+        try {
+            redisTemplate.opsForValue().set("health:check", "ok", Duration.ofSeconds(10));
+            log.info("Redis connection OK - Queue service ready");
+        } catch (Exception e) {
+            log.error("Redis connection FAILED: {}", e.getMessage(), e);
+        }
     }
 
     /**

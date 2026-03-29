@@ -1,0 +1,163 @@
+﻿
+         /\      Grafana   /ÔÇ¥ÔÇ¥/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ÔÇ¥ÔÇ¥\ 
+  /          \   |   (  |  (ÔÇ¥)  |
+ / __________ \  |_|\_\  \_____/ 
+
+     execution: local
+        script: load-test/stock1.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 200 max VUs, 1m30s max duration (incl. graceful stop):
+              * stock1: 200 iterations shared among 200 VUs (maxDuration: 1m0s, gracefulStop: 30s)
+
+
+running (0m01.0s), 200/200 VUs, 0 complete and 0 interrupted iterations
+stock1   [   0% ] 200 VUs  0m01.0s/1m0s  000/200 shared iters
+
+running (0m02.0s), 200/200 VUs, 0 complete and 0 interrupted iterations
+stock1   [   0% ] 200 VUs  0m02.0s/1m0s  000/200 shared iters
+
+running (0m03.0s), 200/200 VUs, 0 complete and 0 interrupted iterations
+stock1   [   0% ] 200 VUs  0m03.0s/1m0s  000/200 shared iters
+
+running (0m04.0s), 200/200 VUs, 0 complete and 0 interrupted iterations
+stock1   [   0% ] 200 VUs  0m04.0s/1m0s  000/200 shared iters
+
+running (0m05.0s), 200/200 VUs, 0 complete and 0 interrupted iterations
+stock1   [   0% ] 200 VUs  0m05.0s/1m0s  000/200 shared iters
+
+running (0m06.0s), 200/200 VUs, 0 complete and 0 interrupted iterations
+stock1   [   0% ] 200 VUs  0m06.0s/1m0s  000/200 shared iters
+
+running (0m07.0s), 200/200 VUs, 0 complete and 0 interrupted iterations
+stock1   [   0% ] 200 VUs  0m07.0s/1m0s  000/200 shared iters
+
+running (0m08.0s), 200/200 VUs, 0 complete and 0 interrupted iterations
+stock1   [   0% ] 200 VUs  0m08.0s/1m0s  000/200 shared iters
+
+running (0m09.0s), 200/200 VUs, 0 complete and 0 interrupted iterations
+stock1   [   0% ] 200 VUs  0m09.0s/1m0s  000/200 shared iters
+
+running (0m10.0s), 200/200 VUs, 0 complete and 0 interrupted iterations
+stock1   [   0% ] 200 VUs  0m10.0s/1m0s  000/200 shared iters
+
+running (0m11.0s), 200/200 VUs, 0 complete and 0 interrupted iterations
+stock1   [   0% ] 200 VUs  0m11.0s/1m0s  000/200 shared iters
+
+running (0m12.0s), 200/200 VUs, 0 complete and 0 interrupted iterations
+stock1   [   0% ] 200 VUs  0m12.0s/1m0s  000/200 shared iters
+
+running (0m13.0s), 200/200 VUs, 0 complete and 0 interrupted iterations
+stock1   [   0% ] 200 VUs  0m13.0s/1m0s  000/200 shared iters
+
+running (0m14.0s), 200/200 VUs, 0 complete and 0 interrupted iterations
+stock1   [   0% ] 200 VUs  0m14.0s/1m0s  000/200 shared iters
+
+running (0m15.0s), 200/200 VUs, 0 complete and 0 interrupted iterations
+stock1   [   0% ] 200 VUs  0m15.0s/1m0s  000/200 shared iters
+
+running (0m16.0s), 200/200 VUs, 0 complete and 0 interrupted iterations
+stock1   [   0% ] 200 VUs  0m16.0s/1m0s  000/200 shared iters
+
+running (0m17.0s), 200/200 VUs, 0 complete and 0 interrupted iterations
+stock1   [   0% ] 200 VUs  0m17.0s/1m0s  000/200 shared iters
+
+running (0m18.0s), 200/200 VUs, 0 complete and 0 interrupted iterations
+stock1   [   0% ] 200 VUs  0m18.0s/1m0s  000/200 shared iters
+
+running (0m19.0s), 200/200 VUs, 0 complete and 0 interrupted iterations
+stock1   [   0% ] 200 VUs  0m19.0s/1m0s  000/200 shared iters
+
+running (0m20.0s), 200/200 VUs, 0 complete and 0 interrupted iterations
+stock1   [   0% ] 200 VUs  0m20.0s/1m0s  000/200 shared iters
+
+running (0m21.0s), 200/200 VUs, 0 complete and 0 interrupted iterations
+stock1   [   0% ] 200 VUs  0m21.0s/1m0s  000/200 shared iters
+
+running (0m22.0s), 200/200 VUs, 0 complete and 0 interrupted iterations
+stock1   [   0% ] 200 VUs  0m22.0s/1m0s  000/200 shared iters
+
+running (0m23.0s), 200/200 VUs, 0 complete and 0 interrupted iterations
+stock1   [   0% ] 200 VUs  0m23.0s/1m0s  000/200 shared iters
+
+running (0m24.0s), 200/200 VUs, 0 complete and 0 interrupted iterations
+stock1   [   0% ] 200 VUs  0m24.0s/1m0s  000/200 shared iters
+
+running (0m25.0s), 200/200 VUs, 0 complete and 0 interrupted iterations
+stock1   [   0% ] 200 VUs  0m25.0s/1m0s  000/200 shared iters
+
+running (0m26.0s), 200/200 VUs, 0 complete and 0 interrupted iterations
+stock1   [   0% ] 200 VUs  0m26.0s/1m0s  000/200 shared iters
+
+running (0m27.0s), 200/200 VUs, 0 complete and 0 interrupted iterations
+stock1   [   0% ] 200 VUs  0m27.0s/1m0s  000/200 shared iters
+
+running (0m28.0s), 200/200 VUs, 0 complete and 0 interrupted iterations
+stock1   [   0% ] 200 VUs  0m28.0s/1m0s  000/200 shared iters
+
+running (0m29.0s), 200/200 VUs, 0 complete and 0 interrupted iterations
+stock1   [   0% ] 200 VUs  0m29.0s/1m0s  000/200 shared iters
+
+running (0m30.0s), 200/200 VUs, 0 complete and 0 interrupted iterations
+stock1   [   0% ] 200 VUs  0m30.0s/1m0s  000/200 shared iters
+k6 : time="2026-03-30T00:44:22+07:00" level=info msg="\n=============
+=========================================================" 
+source=console
+At line:1 char:1
++ k6 run load-test/stock1.js -e BASE_URL=http://localhost:8080 -e 
+STRAT ...
++ 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (time="2026-03-3... sour 
+   ce=console:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+time="2026-03-30T00:44:22+07:00" level=info msg="  BENCHMARK B1 ÔÇö 
+Stock=1 | Strategy: queue" source=console
+time="2026-03-30T00:44:22+07:00" level=info msg="====================
+==================================================" source=console
+time="2026-03-30T00:44:22+07:00" level=info msg="  VUs:        200" 
+source=console
+time="2026-03-30T00:44:22+07:00" level=info msg="  Successes:  0" 
+source=console
+time="2026-03-30T00:44:22+07:00" level=info msg="  Conflicts:  0" 
+source=console
+time="2026-03-30T00:44:22+07:00" level=info msg="  Errors:     200" 
+source=console
+time="2026-03-30T00:44:22+07:00" level=info msg="  Not Found:  0" 
+source=console
+time="2026-03-30T00:44:22+07:00" level=info msg="  ---" 
+source=console
+time="2026-03-30T00:44:22+07:00" level=info msg="  p50:  N/Ams" 
+source=console
+time="2026-03-30T00:44:22+07:00" level=info msg="  p95:  30355.05ms" 
+source=console
+time="2026-03-30T00:44:22+07:00" level=info msg="  p99:  N/Ams" 
+source=console
+time="2026-03-30T00:44:22+07:00" level=info msg="  ---" 
+source=console
+time="2026-03-30T00:44:22+07:00" level=info msg="  DB soldCount:     
+ 0" source=console
+time="2026-03-30T00:44:22+07:00" level=info msg="  DB 
+availableSeats: 100" source=console
+time="2026-03-30T00:44:22+07:00" level=info msg="  DB consistent:    
+ true" source=console
+time="2026-03-30T00:44:22+07:00" level=info msg="  Metric conflicts: 
+ 0" source=console
+time="2026-03-30T00:44:22+07:00" level=info msg="  Metric retries:   
+ 0" source=console
+time="2026-03-30T00:44:22+07:00" level=info msg="  Metric deadlocks: 
+ 0" source=console
+time="2026-03-30T00:44:22+07:00" level=info msg="====================
+==================================================" source=console
+time="2026-03-30T00:44:22+07:00" level=info msg="  ÔÜá´©Å  NO 
+TICKETS SOLD ÔÇö check if seat exists" source=console
+time="2026-03-30T00:44:22+07:00" level=info source=console
+
+running (0m30.4s), 000/200 VUs, 200 complete and 0 interrupted iterations
+stock1 Ô£ô [ 100% ] 200 VUs  0m30.4s/1m0s  200/200 shared iters
+time="2026-03-30T00:44:23+07:00" level=error msg="thresholds on 
+metrics 'http_req_duration' have been crossed"
+

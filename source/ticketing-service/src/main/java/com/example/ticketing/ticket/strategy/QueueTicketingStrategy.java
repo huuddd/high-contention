@@ -55,7 +55,7 @@ public class QueueTicketingStrategy implements TicketingStrategy {
     }
 
     @Override
-    public TicketResult reserveAndBuy(Long eventId, UUID userId, String seatLabel) {
+    public TicketResult reserveAndBuy(Long eventId, UUID userId, String seatLabel, String idempotencyKey) {
         // Bước 1: Tạo unique request ID + CompletableFuture
         String requestId = UUID.randomUUID().toString();
         CompletableFuture<TicketResult> future = queueWorker.registerPending(requestId);
