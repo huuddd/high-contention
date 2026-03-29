@@ -66,7 +66,7 @@ public class OccTicketingStrategy implements TicketingStrategy {
      * Each attempt (doAttempt) runs in its own transaction.
      */
     @Override
-    public TicketResult reserveAndBuy(Long eventId, UUID userId, String seatLabel) {
+    public TicketResult reserveAndBuy(Long eventId, UUID userId, String seatLabel, String idempotencyKey) {
         try {
             // RetryWithBackoff sẽ gọi doAttempt nhiều lần nếu OccConflictException
             // Mỗi lần gọi = 1 transaction mới (vì doAttempt có @Transactional)
@@ -101,7 +101,7 @@ public class OccTicketingStrategy implements TicketingStrategy {
      * Throws OccConflictException on version mismatch → triggers retry in outer loop.
      */
     @Transactional
-    public TicketResult doAttempt(Long eventId, UUID userId, String seatLabel) {
+    public TicketResult doAttempt(Long eventId, UUID userId, String seatLabel, String idempotencyKey) {
         // Bước 1: READ event — plain SELECT, không lock
         // Đọc current version để dùng trong conditional UPDATE
         Event event = eventRepository.findById(eventId).orElse(null);
@@ -161,7 +161,7 @@ public class OccTicketingStrategy implements TicketingStrategy {
         }
 
         // Bước 6: Create ticket — UNIQUE constraint là safety net cuối
-        Ticket ticket = new Ticket(event, seat, userId, null);
+        Ticket ticket = new Ticket(event, seat, userId, idempotencyKey);
         ticket = ticketRepository.save(ticket);
 
         metrics.recordSuccess(strategyName());

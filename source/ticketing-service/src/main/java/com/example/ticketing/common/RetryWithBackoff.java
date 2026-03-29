@@ -120,7 +120,7 @@ public class RetryWithBackoff {
      * Tính delay cho lần retry thứ n.
      * Formula: min(initialDelay * multiplier^(attempt-1) + jitter, maxDelay)
      */
-    long calculateDelay(int attempt) {
+    public long calculateDelay(int attempt) {
         // Exponential: 50 → 100 → 200 → 400 → 800...
         long baseDelay = (long) (initialDelayMs * Math.pow(multiplier, attempt - 1));
 
