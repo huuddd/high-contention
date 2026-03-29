@@ -51,7 +51,7 @@ public class NaiveTicketingStrategy implements TicketingStrategy {
 
     @Override
     @Transactional
-    public TicketResult reserveAndBuy(Long eventId, UUID userId, String seatLabel) {
+    public TicketResult reserveAndBuy(Long eventId, UUID userId, String seatLabel, String idempotencyKey) {
         try {
             // Bước 1: Đọc event — plain SELECT, không lock
             // ⚠️ Tất cả concurrent threads thấy cùng snapshot tại thời điểm này
@@ -99,7 +99,7 @@ public class NaiveTicketingStrategy implements TicketingStrategy {
             }
 
             // Bước 6: Tạo ticket — UNIQUE constraint (event_id, seat_id) là tuyến phòng thủ cuối
-            Ticket ticket = new Ticket(event, seat, userId, null);
+            Ticket ticket = new Ticket(event, seat, userId, idempotencyKey);
             ticket = ticketRepository.save(ticket);
 
             metrics.recordSuccess(strategyName());
