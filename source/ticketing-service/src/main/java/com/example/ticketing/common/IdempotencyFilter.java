@@ -94,11 +94,24 @@ public class IdempotencyFilter extends OncePerRequestFilter {
             }
 
             // Trả cached response từ request gốc
+            // Format: "STATUS_CODE\nRESPONSE_BODY"
             log.debug("Duplicate request detected for idempotency key {}, returning cached response",
                     idempotencyKey);
-            response.setStatus(HttpServletResponse.SC_OK);
+            int cachedStatus = HttpServletResponse.SC_OK;
+            String cachedBody = cachedResponse;
+            int newlineIdx = cachedResponse.indexOf('\n');
+            if (newlineIdx > 0) {
+                try {
+                    cachedStatus = Integer.parseInt(cachedResponse.substring(0, newlineIdx));
+                    cachedBody = cachedResponse.substring(newlineIdx + 1);
+                } catch (NumberFormatException e) {
+                    // Fallback: treat entire value as body with 200 status
+                    log.warn("Failed to parse cached status for key {}, defaulting to 200", idempotencyKey);
+                }
+            }
+            response.setStatus(cachedStatus);
             response.setContentType("application/json");
-            response.getWriter().write(cachedResponse);
+            response.getWriter().write(cachedBody);
             return;
         }
 
@@ -107,10 +120,12 @@ public class IdempotencyFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, responseWrapper);
 
-            // Cache response body vào Redis
+            // Cache status code + response body vào Redis
+            // Format: "STATUS_CODE\nRESPONSE_BODY"
             String responseBody = new String(responseWrapper.getContentAsByteArray());
             if (!responseBody.isEmpty()) {
-                redisTemplate.opsForValue().set(redisKey, responseBody, Duration.ofSeconds(ttlSeconds));
+                String cached = responseWrapper.getStatus() + "\n" + responseBody;
+                redisTemplate.opsForValue().set(redisKey, cached, Duration.ofSeconds(ttlSeconds));
             }
 
             responseWrapper.copyBodyToResponse();
