@@ -55,7 +55,7 @@ public class PessimisticTicketingStrategy implements TicketingStrategy {
 
     @Override
     @Transactional
-    public TicketResult reserveAndBuy(Long eventId, UUID userId, String seatLabel) {
+    public TicketResult reserveAndBuy(Long eventId, UUID userId, String seatLabel, String idempotencyKey) {
         try {
             // Bước 1: Lock event row — SELECT FOR UPDATE
             // Tất cả concurrent threads xếp hàng ở đây (FIFO)
@@ -112,7 +112,7 @@ public class PessimisticTicketingStrategy implements TicketingStrategy {
             }
 
             // Bước 7: Create ticket — UNIQUE constraint là safety net cuối cùng
-            Ticket ticket = new Ticket(event, seat, userId, null);
+            Ticket ticket = new Ticket(event, seat, userId, idempotencyKey);
             ticket = ticketRepository.save(ticket);
 
             // COMMIT xảy ra khi method return → release ALL locks (event + seat)
