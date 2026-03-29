@@ -29,6 +29,7 @@ public record TicketResult(
 
     public enum Status {
         SUCCESS,
+        DUPLICATE,
         SEAT_NOT_AVAILABLE,
         EVENT_NOT_FOUND,
         CONFLICT,
@@ -38,6 +39,10 @@ public record TicketResult(
 
     public static TicketResult success(Long ticketId, Long eventId, String seatLabel, UUID userId) {
         return new TicketResult(Status.SUCCESS, ticketId, eventId, seatLabel, userId, "Ticket purchased successfully");
+    }
+
+    public static TicketResult duplicate(Long ticketId, Long eventId, String seatLabel, UUID userId) {
+        return new TicketResult(Status.DUPLICATE, ticketId, eventId, seatLabel, userId, "Duplicate request — returning existing ticket");
     }
 
     public static TicketResult seatNotAvailable(Long eventId, String seatLabel) {

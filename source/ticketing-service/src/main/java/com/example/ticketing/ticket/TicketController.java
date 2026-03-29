@@ -45,18 +45,22 @@ public class TicketController {
      * POST /tickets/reserve-and-buy — purchase a ticket for a specific seat.
      */
     @PostMapping("/reserve-and-buy")
-    public ResponseEntity<TicketResult> reserveAndBuy(@Valid @RequestBody PurchaseRequest request) {
-        log.info("Purchase request: eventId={}, seatLabel={}, userId={}, strategy={}",
-                request.eventId(), request.seatLabel(), request.userId(), strategy.strategyName());
+    public ResponseEntity<TicketResult> reserveAndBuy(
+            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey,
+            @Valid @RequestBody PurchaseRequest request) {
+        log.info("Purchase request: eventId={}, seatLabel={}, userId={}, strategy={}, idempotencyKey={}",
+                request.eventId(), request.seatLabel(), request.userId(), strategy.strategyName(), idempotencyKey);
 
         TicketResult result = strategy.reserveAndBuy(
                 request.eventId(),
                 request.userId(),
-                request.seatLabel()
+                request.seatLabel(),
+                idempotencyKey
         );
 
         return switch (result.status()) {
             case SUCCESS -> ResponseEntity.status(HttpStatus.CREATED).body(result);
+            case DUPLICATE -> ResponseEntity.status(HttpStatus.OK).body(result);
             case SEAT_NOT_AVAILABLE -> ResponseEntity.status(HttpStatus.CONFLICT).body(result);
             case EVENT_NOT_FOUND -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
             case CONFLICT -> ResponseEntity.status(HttpStatus.CONFLICT).body(result);

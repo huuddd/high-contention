@@ -130,3 +130,4 @@ reservations    → id, event_id, seat_id, user_id, fencing_token, status, expir
 - [x] **1.2** Flyway schema migration — events, seats, tickets, reservations
 - [x] **1.3** Seed data — `make seed` creates 1 event + 100 seats (idempotent)
 - [x] **1.4** Shared utilities — TicketingStrategy, RetryWithBackoff, ConflictMetrics, IdempotencyFilter, JPA entities
+- [x] **3.1** Idempotency — defense-in-depth: Redis cache (status+body) + DB-level duplicate detection via `idempotency_key`
