@@ -26,12 +26,13 @@ public interface TicketingStrategy {
     /**
      * Reserve and buy a ticket for a specific seat in an event.
      *
-     * @param eventId   the event to purchase a ticket for
-     * @param userId    the user making the purchase
-     * @param seatLabel the desired seat label (e.g., "A15")
+     * @param eventId        the event to purchase a ticket for
+     * @param userId         the user making the purchase
+     * @param seatLabel      the desired seat label (e.g., "A15")
+     * @param idempotencyKey optional client-generated key for duplicate detection (nullable)
      * @return result containing ticket ID on success, or error details on failure
      */
-    TicketResult reserveAndBuy(Long eventId, UUID userId, String seatLabel);
+    TicketResult reserveAndBuy(Long eventId, UUID userId, String seatLabel, String idempotencyKey);
 
     /**
      * Returns the strategy name for metrics tagging and logging.
