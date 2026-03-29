@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,9 +29,13 @@ import java.util.UUID;
  *
  * <p><b>Scalability:</b> Stateless controller — scales horizontally.
  * Concurrency bottleneck is in the strategy implementation, not here.
+ *
+ * <p><b>Note:</b> This controller is only active when a TicketingStrategy bean exists.
+ * The Reservation strategy (2.E) uses ReservationController instead.
  */
 @RestController
 @RequestMapping("/tickets")
+@ConditionalOnBean(TicketingStrategy.class)
 public class TicketController {
 
     private static final Logger log = LoggerFactory.getLogger(TicketController.class);

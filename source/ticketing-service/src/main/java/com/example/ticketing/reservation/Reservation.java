@@ -90,7 +90,13 @@ public class Reservation {
     public Instant getExpiresAt() { return expiresAt; }
     public Instant getCreatedAt() { return createdAt; }
 
+    public void setEvent(Event event) { this.event = event; this.eventId = event != null ? event.getId() : null; }
+    public void setSeat(Seat seat) { this.seat = seat; this.seatId = seat != null ? seat.getId() : null; }
+    public void setUserId(UUID userId) { this.userId = userId; }
+    public void setFencingToken(UUID fencingToken) { this.fencingToken = fencingToken; }
     public void setStatus(String status) { this.status = status; }
+    public void setExpiresAt(Instant expiresAt) { this.expiresAt = expiresAt; }
+    public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
 
     public boolean isPending() { return STATUS_PENDING.equals(status); }
     public boolean isExpired() { return STATUS_EXPIRED.equals(status) || Instant.now().isAfter(expiresAt); }

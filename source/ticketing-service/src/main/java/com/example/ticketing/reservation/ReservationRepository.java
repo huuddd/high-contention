@@ -46,7 +46,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
      * Returns 0 if reservation expired, wrong token, or already confirmed/cancelled.
      */
     @Modifying
-    @Query(value = "UPDATE reservations SET status = 'CONFIRMED', updated_at = NOW() " +
+    @Query(value = "UPDATE reservations SET status = 'CONFIRMED' " +
             "WHERE id = :id AND fencing_token = :token AND status = 'PENDING' " +
             "AND expires_at > NOW()", nativeQuery = true)
     int confirmReservation(@Param("id") Long id, @Param("token") UUID token);
@@ -55,7 +55,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
      * Atomic cancel — transitions PENDING → CANCELLED.
      */
     @Modifying
-    @Query(value = "UPDATE reservations SET status = 'CANCELLED', updated_at = NOW() " +
+    @Query(value = "UPDATE reservations SET status = 'CANCELLED' " +
             "WHERE id = :id AND fencing_token = :token AND status = 'PENDING'", nativeQuery = true)
     int cancelReservation(@Param("id") Long id, @Param("token") UUID token);
 
@@ -71,7 +71,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
      * Batch expire — mark all found reservations as EXPIRED.
      */
     @Modifying
-    @Query(value = "UPDATE reservations SET status = 'EXPIRED', updated_at = NOW() " +
+    @Query(value = "UPDATE reservations SET status = 'EXPIRED' " +
             "WHERE id IN :ids AND status = 'PENDING'", nativeQuery = true)
     int expireReservations(@Param("ids") List<Long> ids);
 

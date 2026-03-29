@@ -131,6 +131,12 @@ function Reset-Database {
 
 function Run-K6 {
     param([string]$script, [string]$strategy, [string]$extraEnv = "")
+    # Reservation strategy uses different k6 scripts (2-step flow)
+    if ($strategy -eq "reservation") {
+        $script = $script -replace "stock1\.js", "stock1-reservation.js"
+        $script = $script -replace "hot-seat\.js", "hot-seat-reservation.js"
+        $script = $script -replace "burst\.js", "burst-reservation.js"
+    }
     $cmd = "k6 run $script -e BASE_URL=$BaseUrl -e STRATEGY=$strategy $extraEnv --summary-export=- 2>&1"
     $output = Invoke-Expression $cmd | Out-String
     return $output

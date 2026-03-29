@@ -173,29 +173,31 @@ public class ReservationService {
             }
 
             // Bước 3: Mark seat as SOLD — LOCKED → SOLD
-            int seatUpdated = seatRepository.markLockedAsSold(reservation.getSeat().getId());
+            int seatUpdated = seatRepository.markLockedAsSold(reservation.getSeatId());
             if (seatUpdated == 0) {
                 log.error("Confirm: seat {} could not be marked SOLD after reservation confirmed — "
-                        + "THIS SHOULD NOT HAPPEN", reservation.getSeat().getId());
+                        + "THIS SHOULD NOT HAPPEN", reservation.getSeatId());
                 metrics.recordOversell(STRATEGY_NAME);
                 metrics.recordFailure(STRATEGY_NAME);
                 return ReservationResult.confirmFailed(reservationId, "Seat state inconsistency");
             }
 
-            // Bước 4: Create ticket
-            Ticket ticket = new Ticket(
-                    reservation.getEvent(),
-                    reservation.getSeat(),
-                    reservation.getUserId(),
-                    null
-            );
+            // Bước 4: Create ticket - need to fetch seat and event eagerly
+            Seat seat = seatRepository.findById(reservation.getSeatId()).orElse(null);
+            Event event = eventRepository.findById(reservation.getEventId()).orElse(null);
+            if (seat == null || event == null) {
+                metrics.recordFailure(STRATEGY_NAME);
+                return ReservationResult.confirmFailed(reservationId, "Seat or event not found");
+            }
+
+            Ticket ticket = new Ticket(event, seat, reservation.getUserId(), null);
             ticket = ticketRepository.save(ticket);
 
             metrics.recordSuccess(STRATEGY_NAME);
             log.info("Confirm: ticket {} created from reservation={}, event={}, seat={}, user={}",
                     ticket.getId(), reservationId,
-                    reservation.getEvent().getId(),
-                    reservation.getSeat().getSeatLabel(),
+                    event.getId(),
+                    seat.getSeatLabel(),
                     reservation.getUserId());
             return ReservationResult.confirmed(reservationId, ticket.getId());
 
@@ -229,14 +231,13 @@ public class ReservationService {
         }
 
         // Bước 3: Release seat — LOCKED → AVAILABLE
-        seatRepository.releaseSeat(reservation.getSeat().getId());
+        seatRepository.releaseSeat(reservation.getSeatId());
 
         // Bước 4: Increment available_seats
-        eventRepository.incrementAvailableSeats(reservation.getEvent().getId());
+        eventRepository.incrementAvailableSeats(reservation.getEventId());
 
-        log.info("Cancel: reservation {} cancelled, seat {} released for event={}",
-                reservationId, reservation.getSeat().getSeatLabel(),
-                reservation.getEvent().getId());
+        log.info("Cancel: reservation {} cancelled, seat released for event={}",
+                reservationId, reservation.getEventId());
         return ReservationResult.cancelled(reservationId);
     }
 }
