@@ -131,3 +131,9 @@ reservations    → id, event_id, seat_id, user_id, fencing_token, status, expir
 - [x] **1.3** Seed data — `make seed` creates 1 event + 100 seats (idempotent)
 - [x] **1.4** Shared utilities — TicketingStrategy, RetryWithBackoff, ConflictMetrics, IdempotencyFilter, JPA entities
 - [x] **2.C** OCC + Retry Backoff — version-based conflict detection, exponential backoff + jitter (branch: `impl/occ`)
+- [x] **3.1** Idempotency — defense-in-depth: Redis cache (status+body) + DB-level duplicate detection via `idempotency_key`
+- [x] **3.2** Observability — TicketingStatsService + enhanced `/events/{id}/stats` with Micrometer conflict metrics
+- [x] **4.1** k6 benchmark scripts — stock1.js (B1), hot-seat.js (B2), burst.js (B3) + Makefile targets
+- [x] **4.2** Benchmark comparison table — `docs/bench-final.md` template with A-F comparison + strategy selection guide
+- [x] **4.3** REPORT.md — trade-off analysis, decision framework, 2 khuyến nghị production
+- [x] **tutorial.md** — hướng dẫn chi tiết: setup, chạy, debug, benchmark, SQL/Redis queries, troubleshooting, extensions
