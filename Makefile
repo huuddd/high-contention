@@ -19,6 +19,10 @@
 .PHONY: db-up db-down db-reset db-logs migrate seed app-run \
         bench\:naive bench\:pessimistic bench\:occ \
         bench\:serializable bench\:reservation bench\:queue \
+        hot-seat\:naive hot-seat\:pessimistic hot-seat\:occ \
+        hot-seat\:serializable hot-seat\:reservation hot-seat\:queue \
+        burst\:naive burst\:pessimistic burst\:occ \
+        burst\:serializable burst\:reservation burst\:queue \
         clean help
 
 # --- Configuration -----------------------------------------------------------
@@ -91,6 +95,58 @@ bench\:reservation: ## Run k6 Stock=1 benchmark for Reservation+Fencing
 bench\:queue: ## Run k6 Stock=1 benchmark for Queue-based
 	$(K6) $(LOAD_TEST_DIR)/stock1.js -e BASE_URL=$(BASE_URL) -e STRATEGY=queue
 	@echo "✅ Queue benchmark complete"
+
+# --- Hot-Seat Benchmarks (k6) -----------------------------------------------
+
+hot-seat\:naive: ## Run k6 Hot-Seat benchmark for Naive strategy
+	$(K6) $(LOAD_TEST_DIR)/hot-seat.js -e BASE_URL=$(BASE_URL) -e STRATEGY=naive
+	@echo "✅ Naive hot-seat benchmark complete"
+
+hot-seat\:pessimistic: ## Run k6 Hot-Seat benchmark for Pessimistic Locking
+	$(K6) $(LOAD_TEST_DIR)/hot-seat.js -e BASE_URL=$(BASE_URL) -e STRATEGY=pessimistic
+	@echo "✅ Pessimistic hot-seat benchmark complete"
+
+hot-seat\:occ: ## Run k6 Hot-Seat benchmark for OCC
+	$(K6) $(LOAD_TEST_DIR)/hot-seat.js -e BASE_URL=$(BASE_URL) -e STRATEGY=occ
+	@echo "✅ OCC hot-seat benchmark complete"
+
+hot-seat\:serializable: ## Run k6 Hot-Seat benchmark for SERIALIZABLE
+	$(K6) $(LOAD_TEST_DIR)/hot-seat.js -e BASE_URL=$(BASE_URL) -e STRATEGY=serializable
+	@echo "✅ Serializable hot-seat benchmark complete"
+
+hot-seat\:reservation: ## Run k6 Hot-Seat benchmark for Reservation+Fencing
+	$(K6) $(LOAD_TEST_DIR)/hot-seat.js -e BASE_URL=$(BASE_URL) -e STRATEGY=reservation
+	@echo "✅ Reservation hot-seat benchmark complete"
+
+hot-seat\:queue: ## Run k6 Hot-Seat benchmark for Queue-based
+	$(K6) $(LOAD_TEST_DIR)/hot-seat.js -e BASE_URL=$(BASE_URL) -e STRATEGY=queue
+	@echo "✅ Queue hot-seat benchmark complete"
+
+# --- Burst Benchmarks (k6) --------------------------------------------------
+
+burst\:naive: ## Run k6 Burst benchmark for Naive strategy
+	$(K6) $(LOAD_TEST_DIR)/burst.js -e BASE_URL=$(BASE_URL) -e STRATEGY=naive
+	@echo "✅ Naive burst benchmark complete"
+
+burst\:pessimistic: ## Run k6 Burst benchmark for Pessimistic Locking
+	$(K6) $(LOAD_TEST_DIR)/burst.js -e BASE_URL=$(BASE_URL) -e STRATEGY=pessimistic
+	@echo "✅ Pessimistic burst benchmark complete"
+
+burst\:occ: ## Run k6 Burst benchmark for OCC
+	$(K6) $(LOAD_TEST_DIR)/burst.js -e BASE_URL=$(BASE_URL) -e STRATEGY=occ
+	@echo "✅ OCC burst benchmark complete"
+
+burst\:serializable: ## Run k6 Burst benchmark for SERIALIZABLE
+	$(K6) $(LOAD_TEST_DIR)/burst.js -e BASE_URL=$(BASE_URL) -e STRATEGY=serializable
+	@echo "✅ Serializable burst benchmark complete"
+
+burst\:reservation: ## Run k6 Burst benchmark for Reservation+Fencing
+	$(K6) $(LOAD_TEST_DIR)/burst.js -e BASE_URL=$(BASE_URL) -e STRATEGY=reservation
+	@echo "✅ Reservation burst benchmark complete"
+
+burst\:queue: ## Run k6 Burst benchmark for Queue-based
+	$(K6) $(LOAD_TEST_DIR)/burst.js -e BASE_URL=$(BASE_URL) -e STRATEGY=queue
+	@echo "✅ Queue burst benchmark complete"
 
 # --- Utilities ---------------------------------------------------------------
 
